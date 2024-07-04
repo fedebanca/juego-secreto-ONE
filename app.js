@@ -2,6 +2,7 @@ let numeroSecreto = 0;
 let intentos = 0;
 let listaNumerosSorteados = [];
 let numeroMaximo = 10;
+let numeroMaximoDeIntentos = 3;
 
 /* 
 Document nos permite conectarnos con el archivo html. El parametro recibe un texto, que será un identificador del elemento que queremos usar.
@@ -18,18 +19,24 @@ function asignarTextoElemento(nombreElemento, texto){
 function verificarIntento() {
     let numeroDeUsuario = parseInt(document.getElementById("valorUsuario").value);
 
-    console.log(intentos)
+    console.log(intentos);
     if (numeroDeUsuario === numeroSecreto) {
         asignarTextoElemento('p', `Acertaste el número en ${intentos} ${(intentos == 1) ? 'vez' : 'veces'}`);
-        document.getElementById('reiniciar').removeAttribute('disabled');
+        habilitarBoton('reiniciar');
     } else {
         // El usuario no acertó
-        if (numeroDeUsuario > numeroSecreto) {
-            asignarTextoElemento('p', 'El numero secreto es menor');
-        } else {
-            asignarTextoElemento('p', 'El numero secreto es mayor');
-        }
         intentos ++;
+        if (intentos > numeroMaximoDeIntentos){
+            asignarTextoElemento('p', 'Alcanzaste el número máximo de intentos');
+            deshabilitarBoton('intentar');
+            habilitarBoton('reiniciar');
+        } else {
+            if (numeroDeUsuario > numeroSecreto) {
+                asignarTextoElemento('p', 'El número secreto es menor');
+            } else {
+                asignarTextoElemento('p', 'El número secreto es mayor');
+            }
+        }
         limpiarCaja();
     }
 }
@@ -45,7 +52,8 @@ function generarNumeroSecreto(){
     //Si ya sorteamos todos los números
     if (listaNumerosSorteados.length == numeroMaximo){
         asignarTextoElemento('p','Ya se sortearon todos los números posibles');
-        document.querySelector('#reiniciar').setAttribute('disabled', 'true');
+        deshabilitarBoton('reiniciar');
+        deshabilitarBoton('intentar');
     } else {
         //Si el numero generado está incluido en la lista
         if (listaNumerosSorteados.includes(numeroGenerado)) {
@@ -68,12 +76,23 @@ function condicionesIniciales(){
 function reiniciarJuego(){
     //Limpiar la caja
     limpiarCaja();
+    //Deshabilitar el boton nuevo juego
+    deshabilitarBoton('reiniciar');
+    habilitarBoton('intentar');
     //Indicar mensaje de intervalo de números
     //Generar el número aleatorio   
     //Inicializar el numero de intentos
     condicionesIniciales();
-    //Deshabilitar el boton nuevo juego
-    document.querySelector('#reiniciar').setAttribute('disabled', 'true');
 }
 
-condicionesIniciales()
+function habilitarBoton(idBoton){
+    //Accediendo al elemento con su id mediante getElementById
+    document.getElementById(idBoton).removeAttribute('disabled');
+}
+
+function deshabilitarBoton(idBoton){
+    //Accediendo al elemento con su id mediante querySelector('#...')
+    document.querySelector('#' + idBoton).setAttribute('disabled', 'true');
+}
+
+condicionesIniciales();
